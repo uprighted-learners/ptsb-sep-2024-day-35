@@ -1,42 +1,7 @@
-const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
-
-const app = express();
-
-app.use(express.json());
-
-const PORT = 8080;
-
-mongoose.connect(`${process.env.MONGO_URI}`)
-    .then(() => console.log('Connected to MongoDB!'))
-    .catch(err => console.log(err));
-
-app.get('/api/health', (req, res) => {
-    res.send('Hello World');
-});
-
-// create a schema
-const animalSchema = new mongoose.Schema({
-    name: String,
-    age: Number,
-    captivityRaised: Boolean,
-    latinName: String,
-    species: String,
-    diet: String,
-    habitat: String,
-    numberOfLegs: Number,
-    numberOfTeeth: Number,
-    numberOfEyes: Number,
-    color: String,
-    numberOfDucksOwned: Number,
-})
-
-// create a model
-const Animal = mongoose.model('Animal', animalSchema);
+const Animal = require("../models/animal.model");
 
 // POST - /api/animals - Create a new animal record
-app.post("/api/animals", (request, response) => {
+const createAnimal = async (request, response) => {
     try {
         // create a new animal object using the `animalSchema`
         const newAnimal = new Animal(request.body);
@@ -50,10 +15,10 @@ app.post("/api/animals", (request, response) => {
         console.log(error);
         response.status(500).send(error);
     }
-})
+}
 
 // GET - /api/animals - Read all animals
-app.get("/api/animals", async (req, res) => {
+const getAllAnimals = async (req, res) => {
     try {
         // find all animals in the database
         const allAnimals = await Animal.find({});
@@ -64,10 +29,10 @@ app.get("/api/animals", async (req, res) => {
         console.log(error);
         res.status(500).send(error);
     }
-})
+}
 
 // GET - /api/animals/:id - Read a single animal record
-app.get("/api/animals/:id", async (req, res) => {
+const getAnimalById = async (req, res) => {
     try {
         // find the animal by id
         const animal = await Animal.findById(req.params.id);
@@ -77,10 +42,10 @@ app.get("/api/animals/:id", async (req, res) => {
         console.log(error);
         res.status(500).send(error);
     }
-})
+}
 
 // PUT - /api/animals/:id - Update a single animal record
-app.put("/api/animals/:id", async (req, res) => {
+const updateAnimalById = async (req, res) => {
     try {
         // find the animal by id
         const animal = await Animal.findById(req.params.id);
@@ -105,10 +70,10 @@ app.put("/api/animals/:id", async (req, res) => {
         console.log(error);
         res.status(500).send(error);
     }
-})
+}
 
 // DELETE - /api/animals/:id - Delete a single animal record
-app.delete("/api/animals/:id", async (req, res) => {
+const deleteAnimalById = async (req, res) => {
     try {
         // find the animal by id
         const animal = await Animal.findByIdAndDelete(req.params.id);
@@ -119,8 +84,12 @@ app.delete("/api/animals/:id", async (req, res) => {
         console.log(error);
         res.status(500).send(error);
     }
-})
+}
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+module.exports = {
+    createAnimal,
+    getAllAnimals,
+    getAnimalById,
+    updateAnimalById,
+    deleteAnimalById
+}
